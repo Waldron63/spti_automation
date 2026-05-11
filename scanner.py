@@ -123,7 +123,7 @@ def build_output(target, elapsed, open_ports):
     """
     return {
         "target": target,
-        "scan_time_seconds": round(elapsed, 2),
+        "scan_time_seconds": round(elapsed, 5),
         "timestamp": datetime.now().isoformat(),
         "open_ports": open_ports,
     }

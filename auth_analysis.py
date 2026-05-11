@@ -18,7 +18,7 @@ failed_logins = 0
 successful_logins = 0
 
 # Read auth.log
-with open("auth.log", "r") as file:
+with open("./sample_output/auth.log", "r") as file:
     for line in file:
         # Failed login
         failed_match = failed_pattern.search(line)

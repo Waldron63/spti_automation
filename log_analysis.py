@@ -43,7 +43,7 @@ hourly_requests = defaultdict(int)
 attack_matches = []
 
 # Read log file
-with open("access.log", "r") as file:
+with open("./sample_output/access.log", "r") as file:
     for line in file:
         match = log_pattern.search(line)
 
