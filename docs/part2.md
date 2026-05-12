@@ -99,3 +99,7 @@ Output:
 **Question**
 
 Service version detection (`-sV`) works by sending probe packets and matching responses against a signature database (`nmap-service-probes`). This makes the scan significantly slower and generates more network traffic than a plain port scan. From a defender’s perspective: why is the version string in a service banner valuable intelligence for an attacker? What is the security-relevant difference between `Apache httpd 2.4.54` and a server that returns no version string at all?
+
+A version banner gives the attacker immediate and actionable intelligence: they can query CVE databases (NVD, Exploit-DB, Metasploit) for every known vulnerability affecting that exact version. If Apache 2.4.54 has a known RCE, the attacker finds it in seconds without any fuzzing or blind probing. The version string turns reconnaissance into direct targeting.
+
+A server that suppresses its version string forces the attacker into active fingerprinting: sending test payloads, analyzing edge-case behaviors, or inferring the version indirectly. This takes more time, generates more noise in the logs, and increases the probability of detection. It is not perfect security — an experienced attacker can still infer the version through other means — but it eliminates trivial information gathering and raises the operational cost of the attack. In Apache, the relevant directive is ServerTokens Prod, which returns only Apache with no version number.

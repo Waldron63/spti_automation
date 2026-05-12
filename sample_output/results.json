@@ -1,0 +1,26 @@
+{
+  "target": "scanme.nmap.org",
+  "mode": "domain",
+  "timestamp": "2026-05-11T19:44:02",
+  "findings": {
+    "whois": {
+      "raw_available": true,
+      "registrar": null,
+      "creation_date": null,
+      "expiry_date": null,
+      "registrant_org": null
+    },
+    "dns": {
+      "A": [
+        "scanme.nmap.org.\t5\tIN\tA\t45.33.32.156"
+      ],
+      "MX": [],
+      "NS": [],
+      "TXT": []
+    },
+    "http_headers": {
+      "raw_available": true,
+      "server": "Apache/2.4.7 (Ubuntu)"
+    }
+  }
+}

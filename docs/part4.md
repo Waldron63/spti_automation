@@ -28,3 +28,14 @@ Build `recon.py` — a single-file command-line tool that performs multi-stage r
 5. Structured output — write `results.json` with all findings in a single dict keyed by tool name.
 
 6. Markdown report — generate `report.md` from `results.json`. The report must include: a summary table of findings, open ports (if IP mode), DNS records (if domain mode), and any notable security headers that are missing (CSP, HSTS, X-Frame-Options).
+
+
+Question
+
+Your tool performs active reconnaissance: it sends packets to the target. Shodan performs passive reconnaissance: it has already scanned the internet, and you query its database without touching the target at all. From the perspective of an attacker, what are the operational differences between these two approaches? From the perspective of a defender with network monitoring in place, which approach is harder to detect, and why? In what scenarios would each be more appropriate?
+
+
+Passive reconnaissance with Shodan is virtually undetectable by the defender. Shodan already scanned the target hours or days ago; when the attacker queries its database, the traffic flows from their machine to Shodan's servers — never to the target. No IDS, firewall, or SIEM on the target's network will see that query. The defender has zero visibility into who is researching their infrastructure on Shodan.
+Active reconnaissance leaves clear traces: SYN packets across multiple ports within seconds, DNS queries from unknown external IPs, HTTP requests appearing in access logs. An IDS with port-scanning signatures detects this in real time. A SOC with geo-anomaly alerts will flag an unknown IP running whois and curl against their servers.
+
+In practice, the correct sequence is passive first, active only when necessary: Shodan and OSINT to collect as much as possible without touching the target, and active reconnaissance only to validate specific information that Shodan doesn't have or that may be outdated. Active reconnaissance is unavoidable when you need to confirm the current state of a port or service in real time, but it should be performed with the smallest possible footprint — low concurrency, long timeouts, legitimate User-Agent strings — and always with documented authorization in a legal penetration testing context.

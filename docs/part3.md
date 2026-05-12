@@ -89,3 +89,7 @@ HOURLY TRAFFIC ANOMALY DETECTION
 **Question**
 
 The 3-sigma rule assumes data is approximately normally distributed. Web server traffic often has strong daily periodicity (high during business hours, low overnight). How does this periodicity affect the validity of a single global baseline? Describe a modified approach that would produce fewer false positives on a server with predictable daily traffic cycles.
+
+A global baseline averages high-traffic hours (9am–6pm) together with low-traffic hours (2am–5am). The resulting standard deviation is artificially inflated because it mixes two distinct populations. This produces two problems: a moderately high spike at 3am may appear anomalous even if it is typical for that hour, while a real spike during peak hours may go undetected because the low overnight average pulls the z-score down.
+
+The solution is a per-hour segmented baseline: instead of a single global mean, compute the mean and standard deviation for each hour of the day using historical data from multiple days (for example, the last 7 or 30 days). This way, 3am traffic is compared against the historical 3am baseline, not the daily average. This dramatically reduces false positives on servers with predictable daily cycles. A more sophisticated variant is EWMA (Exponentially Weighted Moving Average), which gives more weight to recent data and adapts to gradual behavioral shifts over time.

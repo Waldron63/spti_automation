@@ -1,0 +1,14 @@
+# Audit log — recon.py
+# Started: 2026-05-11T19:44:00
+
+[2026-05-11T19:44:00] [START] recon.py started: target=scanme.nmap.org mode>
+[2026-05-11T19:44:01] [OK] whois scanme.nmap.org
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org A
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org MX
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org NS
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org TXT
+[2026-05-11T19:44:02] [OK] curl -I -s --max-time 10 http://scanme.nmap.org
+[2026-05-11T19:44:02] [OK] results.json written to ./recon_scanme.nmap.org_>
+[2026-05-11T19:44:02] [OK] report.md written to ./recon_scanme.nmap.org_202>
+[2026-05-11T19:44:02] [DONE] recon.py finished
+
