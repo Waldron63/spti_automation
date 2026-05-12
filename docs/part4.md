@@ -28,9 +28,137 @@ Build `recon.py` — a single-file command-line tool that performs multi-stage r
 5. Structured output — write `results.json` with all findings in a single dict keyed by tool name.
 
 6. Markdown report — generate `report.md` from `results.json`. The report must include: a summary table of findings, open ports (if IP mode), DNS records (if domain mode), and any notable security headers that are missing (CSP, HSTS, X-Frame-Options).
+---
+ 
+**Usage**
+ 
+**Dependencies**
+ 
+```bash
+sudo apt install whois dnsutils curl nmap -y
+```
+ 
+No external Python libraries required. Uses only the Python standard library (`argparse`, `subprocess`, `xml.etree.ElementTree`, `json`, `re`). Requires Python 3.10+.
+ 
+**Commands**
+ 
+```
+python3 recon.py <target> [--mode domain|ip] [--output DIR] [--verbose]
+```
+ 
+| Argument | Description | Default |
+|---|---|---|
+| `target` | Domain name or IP address | required |
+| `--mode` | `domain` or `ip` (auto-detected if omitted) | auto |
+| `--output` | Output directory | `./recon_<target>_<timestamp>/` |
+| `--verbose` | Print progress to stderr | off |
+ 
+**Domain mode:**
+```bash
+python3 recon.py scanme.nmap.org --verbose
+```
+ 
+**IP mode:**
+```bash
+python3 recon.py 45.33.32.156 --mode ip --verbose
+```
+ 
+**Custom output directory:**
+```bash
+python3 recon.py scanme.nmap.org --output ./sample_output --verbose
+```
+ 
+### Expected Output — Domain Mode
+ 
+```
+[*] Target: scanme.nmap.org
+[*] Mode:   domain
+[*] Output: ./recon_scanme.nmap.org_20260511_194400
+[*] Running whois...
+  [~] whois scanme.nmap.org
+[*] Running dig (A, MX, NS, TXT)...
+  [~] dig +noall +answer scanme.nmap.org A
+  [~] dig +noall +answer scanme.nmap.org MX
+  [~] dig +noall +answer scanme.nmap.org NS
+  [~] dig +noall +answer scanme.nmap.org TXT
+[*] Running curl -I (HTTP headers)...
+  [~] curl -I -s --max-time 10 http://scanme.nmap.org
+ 
+[+] Done. Output in: ./recon_scanme.nmap.org_20260511_194400
+    results.json  → ./recon_scanme.nmap.org_20260511_194400/results.json
+    report.md     → ./recon_scanme.nmap.org_20260511_194400/report.md
+    audit.log     → ./recon_scanme.nmap.org_20260511_194400/audit.log
+```
+ 
+### Expected Output — IP Mode
+ 
+```
+[*] Target: 45.33.32.156
+[*] Mode:   ip
+[*] Output: ./recon_45.33.32.156_20260511_194418
+[*] Running nmap (top 100 ports, service detection)...
+  [~] nmap -sV --open --top-ports 100 -oX .../nmap_scan.xml 45.33.32.156
+[*] Running reverse DNS lookup...
+  [~] dig -x 45.33.32.156 +short
+[*] Running whois (IP)...
+  [~] whois 45.33.32.156
+ 
+[+] Done. Output in: ./recon_45.33.32.156_20260511_194418
+    results.json  → ./recon_45.33.32.156_20260511_194418/results.json
+    report.md     → ./recon_45.33.32.156_20260511_194418/report.md
+    audit.log     → ./recon_45.33.32.156_20260511_194418/audit.log
+```
+ 
+### Output Files
+ 
+**`results.json`** — all findings structured by tool:
+```json
+{
+  "target": "scanme.nmap.org",
+  "mode": "domain",
+  "timestamp": "2026-05-11T19:44:02",
+  "findings": {
+    "whois": {
+      "raw_available": true,
+      "registrar": "MarkMonitor Inc.",
+      "creation_date": "2000-08-25T04:00:00Z",
+      "expiry_date": "2027-08-24T04:00:00Z",
+      "registrant_org": "Nmap Project"
+    },
+    "dns": {
+      "A": ["scanme.nmap.org.  5  IN  A  45.33.32.156"],
+      "MX": [],
+      "NS": ["scanme.nmap.org.  86400  IN  NS  ns1.linode.com."],
+      "TXT": []
+    },
+    "http_headers": {
+      "raw_available": true,
+      "server": "Apache/2.4.7 (Ubuntu)"
+    }
+  }
+}
+```
+ 
+**`report.md`** — human-readable Markdown report including summary table, DNS records or open ports, HTTP headers, and missing security headers.
+ 
+**`audit.log`** — timestamped log of every action taken:
+```
+# Audit log — recon.py
+# Started: 2026-05-11T19:44:00
+ 
+[2026-05-11T19:44:00] [START] recon.py started: target=scanme.nmap.org mode=domain
+[2026-05-11T19:44:01] [OK] whois scanme.nmap.org
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org A
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org MX
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org NS
+[2026-05-11T19:44:01] [OK] dig +noall +answer scanme.nmap.org TXT
+[2026-05-11T19:44:02] [OK] curl -I -s --max-time 10 http://scanme.nmap.org
+[2026-05-11T19:44:02] [OK] results.json written to ./recon_.../results.json
+[2026-05-11T19:44:02] [OK] report.md written to ./recon_.../report.md
+[2026-05-11T19:44:02] [DONE] recon.py finished
+```
 
-
-Question
+**Question**
 
 Your tool performs active reconnaissance: it sends packets to the target. Shodan performs passive reconnaissance: it has already scanned the internet, and you query its database without touching the target at all. From the perspective of an attacker, what are the operational differences between these two approaches? From the perspective of a defender with network monitoring in place, which approach is harder to detect, and why? In what scenarios would each be more appropriate?
 
