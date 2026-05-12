@@ -1,4 +1,4 @@
-# spti_automation
+# Automation
 
 Este repositorio contiene un conjunto de scripts de Python para realizar análisis de seguridad y automatización de tareas relacionadas.
 
@@ -55,6 +55,10 @@ Sigue estos pasos para configurar el proyecto en tu entorno local.
         ```bash
         python3 log_analysis.py sample_output/access.log
         ```
+    -   **Herramienta de reconocimiento integrada:**
+        ```bash
+        python3 recon.py scanme.nmap.org --output ./sample_output --verbose
+        ```
 
 ## Entorno
 
@@ -66,6 +70,7 @@ spti_automation/
 ├── parse_scan.py       # Part 2: nmap XML parser and enricher
 ├── auth_analysis.py    # Part 3: auth log analysis
 ├── log_analysis.py     # Part 3: web log analysis + anomaly detection
+├── recon.py            # Part 4: integrated tool
 ├── README.md           # Setup instructions and per-script explanation
 ├── docs/
 │   ├── part1.md
@@ -74,8 +79,11 @@ spti_automation/
 │   └── part4.md
 └── sample_output/
     ├── access.log
+    ├── audit.log
     ├── auth.log
     ├── hosts.json
+    ├── report.md
+    ├── results.json
     ├── scan.xml
     └── stdout.txt
 ```
